@@ -222,7 +222,7 @@ class Curl {
 		if( $this->meta->referer !== False ){
             // curl_setopt($ch,  CURLOPT_REFERER, $this->meta->referer . ';auto');
             curl_setopt($ch,  CURLOPT_REFERER, $this->meta->referer);
-			curl_setopt($ch, CURLOPT_AUTOREFERER, True);
+			// curl_setopt($ch, CURLOPT_AUTOREFERER, True);
 		}
 		if( $this->meta->save_file === True ){
 			$file = @fopen($this->meta->file_path, "w");
