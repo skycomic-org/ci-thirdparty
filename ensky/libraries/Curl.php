@@ -125,9 +125,9 @@ class Curl {
 	// Set the proxy server.
 	// String server
 	// Default : ensky.tw:3128
-	public function proxy($server){
+	public function proxy ($server=False) {
 		if ( is_array($server) ) {
-			$server = $server[ rand( 0, count($server)-1 ) ];
+			$server = count($server) > 0 ? $server[ rand( 0, count($server)-1 ) ] : False;
 		}
 		$this->meta->proxy = $server;
 		return $this;
