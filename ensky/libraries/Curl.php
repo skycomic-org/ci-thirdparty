@@ -38,10 +38,10 @@ class Curl {
 		$this->meta->useragent = 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.17 (KHTML, like Gecko) Chrome/24.0.1312.52 Safari/537.17';
 		return $this;
 	}
-	
-	
+
+
 	/* Settings */
-	
+
 	// Set Url.
 	// String, Ex:http://comic.ensky.tw/
 	// Default empty
@@ -49,7 +49,7 @@ class Curl {
 		$this->meta->url = $url;
 		return $this;
 	}
-	
+
 	// Set Method, GET or POST.
 	// String GET/POST
 	// Default : GET
@@ -57,7 +57,7 @@ class Curl {
 		$this->meta->method = strtoupper($method) === 'POST' ? 'POST' : 'GET';
 		return $this;
 	}
-	
+
 	// Set Referer URL.
 	// String, Ex:http://comic.ensky.tw/
 	// Default empty
@@ -65,7 +65,7 @@ class Curl {
 		$this->meta->referer = $referer;
 		return $this;
 	}
-	
+
 	// Set save cookie or not.
 	// Boolean
 	// Default : False
@@ -73,7 +73,7 @@ class Curl {
 		$this->meta->save_cookie = $s === True;
 		return $this;
 	}
-	
+
 	// Set cookie path.
 	// String, EX: /tmp/cookie.txt
 	// Default : $this->tmpFolder . 'cookie.txt'
@@ -81,7 +81,7 @@ class Curl {
 		$this->meta->cookie_path = $c_p;
 		return $this;
 	}
-	
+
 	// Set save file or not.
 	// Boolean
 	// Default : False
@@ -89,7 +89,7 @@ class Curl {
 		$this->meta->save_file = $s === True;
 		return $this;
 	}
-	
+
 	// Set file path.
 	// String, EX: /tmp/1.jpg
 	// Default empty
@@ -97,7 +97,7 @@ class Curl {
 		$this->meta->file_path = $c_p;
 		return $this;
 	}
-	
+
 	// Set timeout for EACH FILE.
 	// Int seconds
 	// Default : 60
@@ -105,7 +105,7 @@ class Curl {
 		$this->meta->timeout = intval($timeout);
 		return $this;
 	}
-	
+
 	// Set Useragent.
 	// String
 	// Default : Mozilla/5.0 (Windows; U; Windows NT 6.1; zh-TW; rv:1.9.2.13) Gecko/20101203 Firefox/3.6.13
@@ -113,7 +113,7 @@ class Curl {
 		$this->meta->useragent = $useragent;
 		return $this;
 	}
-	
+
 	// Set the sleep time before grabing a file.
 	// Int microseconds
 	// Default : 15000
@@ -121,7 +121,7 @@ class Curl {
 		$this->meta->sleep = intval($sleep);
 		return $this;
 	}
-	
+
 	// Set the proxy server.
 	// String server
 	// Default : ensky.tw:3128
@@ -132,7 +132,7 @@ class Curl {
 		$this->meta->proxy = $server;
 		return $this;
 	}
-	
+
 	// Set Query String's Key and Value Pair.
 	// String key, String value
 	// no default
@@ -140,13 +140,13 @@ class Curl {
 		$this->meta->queryArray[$key] = array($value, $escape);
 		return $this;
 	}
-	
+
 	public function tmp_folder ($tmp) {
 		$this->tmpFolder = $tmp;
 		return $this;
 	}
-	
-	
+
+
 	// Set Header String's Key and Value Pair.
 	// String key, String value
 	// no default
@@ -155,7 +155,7 @@ class Curl {
 		return $this;
 	}
 	/* Get Data Methods. */
-	
+
 	// Get query string, while GET would be ?aa=xx&bb=yy,
 	// and POST would be aa=xx&bb=yy
 	public function query_string($encode=True){
@@ -178,7 +178,7 @@ class Curl {
 		}
 		return ( $this->meta->method === 'GET' && !empty($str) )  ? '?'.$str : $str;
 	}
-	
+
 	// Get header array
 	public function header_array(){
 		$arr = array();
@@ -187,23 +187,23 @@ class Curl {
 		}
 		return $arr;
 	}
-	
+
 	// Get url, query string included.
 	public function get_url($query_string = True){
-		return $this->meta->method === 'GET' && $query_string === True ? 
+		return $this->meta->method === 'GET' && $query_string === True ?
 			   $this->meta->url . $this->query_string() : $this->meta->url;
 	}
-	
+
 	/* Main Methods */
-	
+
 	// Add a job.
 	public function add(){
 		$this->meta->url_full = $this->get_url();
-		
+
 		if(strlen($this->meta->url_full) < 14){
 			throw new Exception($this->meta->url_full .'Empty url.');
 		}
-		
+
 		$ch = curl_init( $this->meta->url_full );
 		if( count($this->meta->headerArray) > 0 ){
 			curl_setopt($ch, CURLOPT_HTTPHEADER, $this->header_array());
@@ -254,20 +254,20 @@ class Curl {
 	public function get(){
 		$instances = array_shift($this->instances);
 		extract($instances);
-		
+
 		usleep($meta->sleep);
-		
+
 		$save_file = $meta->save_file;
 		if($save_file !== True){
 			curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
 			// curl_setopt($ch, CURLOPT_HEADER, 1);
 		}
-		
+
 		$response = curl_exec($ch);
-		
+
 		curl_close($ch);
-		
-		
+
+
 		$this->initial();
 		if( $save_file === True ){
 			fclose($fp);
@@ -276,10 +276,10 @@ class Curl {
 			return $response;
 		}
 	}
-	
-	
+
+
 	/* Multi Methods. */
-	
+
 	// Set multi-grab limitation.
 	// Int
 	// Default : 50
@@ -287,7 +287,7 @@ class Curl {
 		$this->meta->multi_limit = intval($limit);
 		return $this;
 	}
-	
+
 	// Get all jobs.
 	// return a array includes all not saving jobs' HTML,
 	// or True for all jobs are saving jobs.
@@ -300,7 +300,7 @@ class Curl {
 
 		// CleanUp meta.
 		$this->initial();
-		
+
 		if( count($chs) > $limit ){
 			$chs1 = array_slice($chs, 0, $limit);
 			$chs2 = array_slice($chs, $limit);
@@ -321,7 +321,7 @@ class Curl {
 				}
 				curl_multi_add_handle($mh,$row['ch']);
 			}
-			
+
 			do{
 				usleep(50);
 				$n = curl_multi_exec($mh,$threads);
@@ -346,15 +346,15 @@ class Curl {
 				}
 			}
 			curl_multi_close($mh);
-			
+
 			return count($return) != 0 ? $return : True;
 		}
 	}
-	
+
 	/* Old functions, for compatiblity only */
 	public function getData($url,$referer=false,$login=false,$post=false){
 		usleep($this->getDataUsleep);
-		
+
 		$ch = curl_init($url);
 		if( $login === TRUE )
 		{
@@ -379,12 +379,12 @@ class Curl {
 		curl_setopt($ch, CURLOPT_AUTOREFERER, 1);
 		curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
 		curl_setopt($ch, CURLOPT_MAXREDIRS, 10);
-		
+
 		$response = curl_exec($ch);
 		curl_close($ch);
 		return $response;
 	}
-	
+
 	public function getDataWithInfo($url,$referer=false,$post=false,&$info){
 		usleep($this->getDataUsleep);
 		$ch = curl_init($url);
@@ -404,15 +404,15 @@ class Curl {
 		curl_setopt($ch, CURLOPT_AUTOREFERER, 1);
 		curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
 		curl_setopt($ch, CURLOPT_MAXREDIRS, 10);
-		
+
 		$response = curl_exec($ch);
-		
+
 		$info = curl_getinfo($ch);
-		
+
 		curl_close($ch);
 		return $response;
 	}
-	
+
 	public function getData_multi_tmp($urls,$ref=False){
 		if( !is_dir($this->tmpFolder) ){
 			mkdir($this->tmpFolder,0755);
@@ -425,7 +425,7 @@ class Curl {
 			$fileNames[] = $this->tmpFolder .md5( $url );
 		}
 		$this->getData_multi($urls,$ref,$fileNames);
-		
+
 		$data=array();
 		foreach( $fileNames as $i=> $fileName ){
 			if( is_file($fileName) ){
@@ -437,7 +437,7 @@ class Curl {
 		}
 		return $data;
 	}
-	
+
 	public function getData_multi($urls,$ref=False,$files=False){
 		if($files === False){
 			return getData_multi_tmp($urls,$ref);
@@ -466,9 +466,10 @@ class Curl {
 				curl_setopt($c[$col], CURLOPT_FILE, $f[$col]);
 				curl_setopt($c[$col], CURLOPT_HEADER, 0);
 				curl_setopt($c[$col], CURLOPT_TIMEOUT,600);
+				curl_setopt($c[$col], CURLOPT_FOLLOWLOCATION, 1);
 				curl_multi_add_handle($mh,$c[$col]);
 			}
-			
+
 			do{
 				usleep(50);
 				$n=curl_multi_exec($mh,$threads);
