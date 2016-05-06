@@ -3,18 +3,12 @@ class Curl {
 	private $getDataUsleep = 15000;
 	private $OnceDownLimit = 50;
 	private $tmpFolder = '';
-	// private $tmpFolder = 'E:/temp/system/';
 	private $instances = array();
 
 	function __construct () {
 		$this->initial();
 	}
-/*
-	private function network_ok(){
-		$ip = `/sbin/ping -c 1 -t 1 168.95.1.1 | grep time= | cut -d '=' -f 4`;
-		return !empty($ip);
-	}
-*/
+
 	// initial variables definition.
 	private function initial () {
 		if( !isset($this->meta) ){
@@ -31,7 +25,7 @@ class Curl {
 		$this->meta->cookie_path = $this->tmpFolder . 'cookie.txt';
 		$this->meta->save_file = False;
 		$this->meta->file_path = '';
-		$this->meta->timeout = 60;
+		$this->meta->timeout = 10;
 		$this->meta->multi_limit = 50;
 		$this->meta->sleep = 15000;
 		$this->meta->proxy = False;// = 'ensky.tw:3128';
@@ -291,17 +285,17 @@ class Curl {
 	// Get all jobs.
 	// return a array includes all not saving jobs' HTML,
 	// or True for all jobs are saving jobs.
-	public function get_all($chs = False){
+	public function get_all ($chs = False) {
 		$limit = $this->meta->multi_limit;
 		$timeout = $this->meta->multi_limit * $this->meta->timeout;
-		if($chs === False){
+		if ($chs === False) {
 			$chs = $this->instances;
 		}
 
 		// CleanUp meta.
 		$this->initial();
 
-		if( count($chs) > $limit ){
+		if ( count($chs) > $limit ) {
 			$chs1 = array_slice($chs, 0, $limit);
 			$chs2 = array_slice($chs, $limit);
 			$data1 = $this->get_all($chs1);
@@ -319,17 +313,17 @@ class Curl {
 					}
 					curl_setopt($row['ch'], CURLOPT_FILE, $row['fp']);
 				}
-				curl_multi_add_handle($mh,$row['ch']);
+				curl_multi_add_handle($mh, $row['ch']);
 			}
 
-			do{
+			do {
 				usleep(50);
-				$n = curl_multi_exec($mh,$threads);
+				$n = curl_multi_exec($mh, $threads);
 			} while ($threads > 0);
 
 			$return = array();
-			foreach ($chs as $row) {
-				@curl_multi_remove_handle($mh,$row['ch']);
+			foreach ($chs as &$row) {
+				@curl_multi_remove_handle($mh, $row['ch']);
 				@curl_close($row['ch']);
 				@fclose ($row['fp']);
 				if( $row['meta']->save_file === False ){
@@ -339,8 +333,8 @@ class Curl {
 					} else {
 						$tmp = @file_get_contents( $row['meta']->url_full );
 					}
-					if(strlen($tmp) < 50){
-						throw new Exception($row['meta']->url_full.'File Get Error.');
+					if (strlen($tmp) < 50) {
+						echo $row['meta']->url_full . 'File Get Error.' . $tmp . "\n";
 					}
 					$return[]=$tmp;
 				}
@@ -413,20 +407,20 @@ class Curl {
 		return $response;
 	}
 
-	public function getData_multi_tmp($urls,$ref=False){
-		if( !is_dir($this->tmpFolder) ){
-			mkdir($this->tmpFolder,0755);
-			if( !is_dir($this->tmpFolder) ){
+	public function getData_multi_tmp($urls, $ref=False) {
+		if ( !is_dir($this->tmpFolder) ) {
+			mkdir($this->tmpFolder, 0755);
+			if(!is_dir($this->tmpFolder)) {
 				throw new Exception("CURL : getData_multi_tmp: can't open new tmp folder: {$this->tmpFolder}.");
 			}
 		}
 		$fileNames=array();
-		foreach( $urls as $url ){
+		foreach ( $urls as $url ) {
 			$fileNames[] = $this->tmpFolder .md5( $url );
 		}
-		$this->getData_multi($urls,$ref,$fileNames);
+		$this->getData_multi($urls, $ref, $fileNames);
 
-		$data=array();
+		$data = array();
 		foreach( $fileNames as $i=> $fileName ){
 			if( is_file($fileName) ){
 				$data[] = @file_get_contents($fileName);
@@ -438,7 +432,7 @@ class Curl {
 		return $data;
 	}
 
-	public function getData_multi($urls,$ref=False,$files=False){
+	public function getData_multi($urls, $ref=False, $files=False){
 		if($files === False){
 			return getData_multi_tmp($urls,$ref);
 		}
@@ -472,9 +466,8 @@ class Curl {
 
 			do{
 				usleep(50);
-				$n=curl_multi_exec($mh,$threads);
-			}
-			while ($threads > 0);
+				$n = curl_multi_exec($mh,$threads);
+			} while ($threads > 0);
 
 			foreach ($urls as $col => $url) {
 				curl_multi_remove_handle($mh,$c[$col]);
